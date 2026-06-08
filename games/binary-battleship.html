@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Binary Battleship | BEHS Engineering</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --behs-red: #8b0000;
+            --terminal-green: #00ff41;
+            --bg-dark: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --cell-size: clamp(25px, 4vw, 35px);
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: #eee;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--behs-red);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 10px 0;
+            font-size: 1.8rem;
+        }
+
+        .topbar {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .board-area {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .board {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .board h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .grid {
+            display: grid;
+            gap: 4px;
+            padding: 5px;
+            background: #111;
+            border-radius: 4px;
+        }
+
+        .cell {
+            width: var(--cell-size);
+            height: var(--cell-size);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            font-size: 14px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .label {
+            color: var(--behs-red);
+            font-weight: bold;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: var(--cell-size);
+            height: var(--cell-size);
+        }
+
+        .water { background: #222; border: 1px solid #333; }
+        .ship  { background: #444; border: 1px solid var(--behs-red); }
+        .hit   { background: var(--behs-red); color: white; font-weight: bold; }
+        .miss  { background: #333; color: #555; }
+
+        .controls {
+            margin-top: 25px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        input[type='text'], select, input[type='number'] {
+            background: #000;
+            border: 1px solid #444;
+            color: var(--terminal-green);
+            padding: 10px;
+            border-radius: 6px;
+            font-family: 'Space Grotesk', sans-serif;
+            outline: none;
+        }
+
+        input.error { border-color: red; background: #200; }
+
+        button {
+            padding: 10px 18px;
+            border-radius: 6px;
+            border: none;
+            background: var(--behs-red);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        button.secondary { background: #444; }
+
+        .log {
+            margin-top: 20px;
+            color: var(--terminal-green);
+            font-family: 'Courier New', monospace;
+            background: #000;
+            padding: 15px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            border-left: 4px solid var(--behs-red);
+            font-size: 13px;
+            min-height: 20px;
+        }
+
+        .cheatsheet {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            color: #aaa;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+        
+        footer { margin-top: 20px; color: #555; font-size: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <h1>Binary Battleship</h1>
+    
+    <div class="topbar">
+        <select id="modeSelect">
+            <option value="random">Random Mode</option>
+            <option value="practice">Practice Mode</option>
+        </select>
+        <input id="shipCount" type="number" min="3" max="10" value="5" style="width: 50px;">
+        <select id="gridSize">
+            <option value="8">8x8 (3-bit)</option>
+            <option value="16">16x16 (4-bit)</option>
+        </select>
+        <button id="startBtn">System Start</button>
+        <button id="toggleCheat" class="secondary">Decoder Key</button>
+    </div>
+
+    <div class="board-area">
+        <div class="board">
+            <h2>Player Systems</h2>
+            <div class="grid" id="playerGrid"></div>
+        </div>
+        <div class="board">
+            <h2>Enemy Matrix</h2>
+            <div class="grid" id="oppGrid"></div>
+        </div>
+    </div>
+
+    <div id="cheatWrap" style="display:none; width: 90%; max-width: 600px;">
+        <div class="board" style="margin-top: 20px;">
+            <div class="cheatsheet" id="cheatContent"></div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="input-row">
+            <input id="rowInput" type="text" placeholder="ROW BIN" maxlength="4" style="width: 80px;">
+            <span style="color:var(--behs-red)">X</span>
+            <input id="colInput" type="text" placeholder="COL BIN" maxlength="4" style="width: 80px;">
+            <button id="fireBtn">Fire Strike</button>
+        </div>
+    </div>
+
+    <div class="log" id="log">Initialize system to begin...</div>
+
+    <footer>Grid decimal labels are provided for reference. You must enter coordinates in BINARY.</footer>
+
+<script>
+(() => {
+    const MIN_SHIPS = 3, MAX_SHIPS = 10;
+    let size = 8, oppGrid=[], playerGrid=[], ships=[], playerShips=[], cpuShips=[];
+    let playerShipsRemaining=0, cpuShipsRemaining=0, cpuTargets=[];
+
+    const playerGridEl=document.getElementById('playerGrid');
+    const oppGridEl=document.getElementById('oppGrid');
+    const modeSelect=document.getElementById('modeSelect');
+    const shipCountInput=document.getElementById('shipCount');
+    const gridSizeSelect=document.getElementById('gridSize');
+    const startBtn=document.getElementById('startBtn');
+    const rowInput=document.getElementById('rowInput');
+    const colInput=document.getElementById('colInput');
+    const fireBtn=document.getElementById('fireBtn');
+    const logEl=document.getElementById('log');
+    const toggleCheat=document.getElementById('toggleCheat');
+    const cheatWrap=document.getElementById('cheatWrap');
+    const cheatContent=document.getElementById('cheatContent');
+
+    function log(msg){ logEl.innerHTML= `> ${msg}`; }
+    function bitsNeeded(n){ return Math.max(1,Math.ceil(Math.log2(n))); }
+    function decToBin(num,bits){ return num.toString(2).padStart(bits,'0'); }
+    
+    function binToDec(b){ 
+        if(!b) return NaN; 
+        b=b.trim(); 
+        if(!/^[01]+$/.test(b)) return NaN; 
+        return parseInt(b,2);
+    }
+
+    function makeGrid(n){ return Array.from({length:n},()=>Array.from({length:n},()=>({hasShip:false,hit:false,miss:false}))); }
+    
+    function clearGrids(){ 
+        oppGrid=makeGrid(size); 
+        playerGrid=makeGrid(size); 
+        cpuTargets=[]; 
+    }
+
+    function render(){ 
+        renderGrid(playerGridEl,playerGrid,true); 
+        renderGrid(oppGridEl,oppGrid,false); 
+        buildCheat(); 
+    }
+
+    function renderGrid(container,grid,revealShips){
+        container.innerHTML='';
+        const n=grid.length;
+        container.style.gridTemplateColumns=`repeat(${n+1}, auto)`;
+        const corner=document.createElement('div'); corner.className='label'; container.appendChild(corner);
+        for(let c=0;c<n;c++){const lbl=document.createElement('div'); lbl.className='label'; lbl.textContent=c; container.appendChild(lbl);}
+        for(let r=0;r<n;r++){
+            const rowLbl=document.createElement('div'); rowLbl.className='label'; rowLbl.textContent=r; container.appendChild(rowLbl);
+            for(let c=0;c<n;c++){
+                const cell=document.createElement('div'); cell.className='cell water';
+                const state=grid[r][c];
+                if(state.hit){cell.className='cell hit'; cell.textContent='✖';}
+                else if(state.miss){cell.className='cell miss'; cell.textContent='•';}
+                else if(state.hasShip && revealShips){cell.className='cell ship';}
+                container.appendChild(cell);
+            }
+        }
+    }
+
+    function getShipSizes(count){
+        let sizes = [5,4,3,3,2,2,2,2,2,2];
+        return sizes.slice(0, count);
+    }
+
+    function placeShipsRandomly(grid, shipSizes){
+        const n=grid.length; const placedShips=[];
+        for(const len of shipSizes){
+            let placed=false; let attempts=0;
+            while(!placed && attempts<500){
+                attempts++;
+                const horiz=Math.random()<0.5;
+                const r=Math.floor(Math.random()*(horiz?n:n-len+1));
+                const c=Math.floor(Math.random()*(horiz?n-len+1:n));
+                let ok=true;
+                for(let i=0;i<len;i++){
+                    const rr=r+(horiz?0:i), cc=c+(horiz?i:0);
+                    if(grid[rr][cc].hasShip){ok=false; break;}
+                }
+                if(!ok) continue;
+                const cells=[];
+                for(let i=0;i<len;i++){const rr=r+(horiz?0:i), cc=c+(horiz?i:0); grid[rr][cc].hasShip=true; cells.push([rr,cc]);}
+                placedShips.push({cells,hits:0});
+                placed=true;
+            }
+        }
+        return placedShips;
+    }
+
+    function setupGame(){
+        size=parseInt(gridSizeSelect.value)||8;
+        let count=parseInt(shipCountInput.value)||5;
+        const shipSizes=getShipSizes(count);
+        clearGrids();
+        cpuShips=placeShipsRandomly(oppGrid,shipSizes); 
+        playerShips=placeShipsRandomly(playerGrid,shipSizes);
+        playerShipsRemaining=count; cpuShipsRemaining=count;
+        render(); 
+        log(`System Ready. Grid: ${size}x${size}. Ships: ${count}.`);
+    }
+
+    function buildCheat(){
+        cheatContent.innerHTML='';
+        const bits=bitsNeeded(size-1);
+        for(let i=0;i<size;i++){
+            const div=document.createElement('div'); 
+            div.innerHTML=`<span style="color:var(--behs-red)">${i}:</span> ${decToBin(i,bits)}`; 
+            cheatContent.appendChild(div);
+        }
+    }
+
+    function findShipByCell(shipsArr,r,c){
+        return shipsArr.find(ship=>ship.cells.some(([sr,sc])=>sr===r && sc===c));
+    }
+
+    function playerAttack(){
+        const r=binToDec(rowInput.value), c=binToDec(colInput.value);
+        if(isNaN(r)||isNaN(c)||r<0||c<0||r>=size||c>=size){
+            log('ERROR: Coordinate out of bounds or invalid binary.');
+            return;
+        }
+        const cell=oppGrid[r][c];
+        if(cell.hit||cell.miss){ log('Cell already targeted.'); return; }
+        
+        if(cell.hasShip){
+            cell.hit=true;
+            const hitShip=findShipByCell(cpuShips,r,c);
+            hitShip.hits++;
+            if(hitShip.hits===hitShip.cells.length){
+                cpuShipsRemaining--; 
+                log(`CRITICAL HIT: Enemy vessel destroyed!`);
+            } else {
+                log(`HIT: Target confirmed at ${rowInput.value}, ${colInput.value}`);
+            }
+        } else {
+            cell.miss=true; 
+            log('MISS: No target found.');
+        }
+        
+        render();
+        if(cpuShipsRemaining<=0){ log('VICTORY: Enemy fleet neutralized.'); return; }
+        setTimeout(cpuAttack, 800);
+    }
+
+    function cpuAttack(){
+        let r,c,cell;
+        if(cpuTargets.length>0){
+            [r,c]=cpuTargets.shift(); cell=playerGrid[r][c];
+            if(cell.hit||cell.miss) return cpuAttack();
+        } else {
+            do{ r=Math.floor(Math.random()*size); c=Math.floor(Math.random()*size); cell=playerGrid[r][c]; }
+            while(cell.hit||cell.miss);
+        }
+        if(cell.hasShip){
+            cell.hit=true;
+            const hitShip=findShipByCell(playerShips,r,c);
+            hitShip.hits++;
+            if(hitShip.hits===hitShip.cells.length) playerShipsRemaining--;
+            log(`WARNING: Friendly vessel hit at ${r}, ${c}!`);
+            addCpuTargets(r,c);
+        } else {
+            cell.miss=true; 
+            log(`CPU scan at ${r}, ${c} returned MISS.`);
+        }
+        render();
+        if(playerShipsRemaining<=0) log('DEFEAT: Friendly fleet compromised.');
+    }
+
+    function addCpuTargets(r,c){
+        [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([nr,nc])=>{
+            if(nr>=0&&nr<size&&nc>=0&&nc<size&&!playerGrid[nr][nc].hit) cpuTargets.push([nr,nc]);
+        });
+    }
+
+    startBtn.onclick=setupGame;
+    fireBtn.onclick=playerAttack;
+    toggleCheat.onclick=()=>{cheatWrap.style.display=cheatWrap.style.display==='none'?'block':'none';};
+    
+    // Live validation
+    [rowInput, colInput].forEach(el => {
+        el.oninput = () => {
+            el.classList.toggle('error', isNaN(binToDec(el.value)) && el.value !== "");
+        };
+    });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLTW Article Resources | BEHS Engineering</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/BEHS-Engineering-Hub/css/style.css">
+
+    <style>
+/* The Main Grid */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    padding: 20px 0;
+}
+
+/* Updated Resource Card - Matching your index .card style */
+.media-card {
+    background: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid #2a2a2a;
+    border-top: 4px solid #8b0000;
+    border-radius: 12px;
+    padding: 20px;
+    padding-top: 85px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 220px; 
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.media-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(139, 0, 0, 0.3);
+    border-top-color: #d4af37; /* Turns Gold on hover */
+}
+
+/* Floating Circular Icon Container */
+.card-image {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 55px;
+    height: 55px;
+    background: #1a1a1a;
+    border: 2px solid #8b0000;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    z-index: 10;
+}
+
+/* The Icon: Shrunk to fit inside the circle */
+.card-icon {
+    width: 70%; /* Shrinks image to 70% of the circle size */
+    height: 70%;
+    object-fit: contain; /* Ensures the whole image is visible, no stretching */
+}
+
+.media-card:hover .card-image {
+    border-color: #d4af37; /* Circle border turns gold on hover */
+}
+
+/* Category Label */
+.category-label {
+    color: #d4af37;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem; /* Slightly smaller to fit better */
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: absolute;
+    top: 20px;
+    right: 20px; /* Moved to the right */
+    text-align: right;
+    max-width: 180px; /* Prevents long titles from hitting the icon */
+}
+
+/* Title matching your .card h3 */
+.media-card h3 {
+    color: #d4af37;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.15rem;
+    margin: 5px 0 15px 0;
+    line-height: 1.3;
+}
+
+/* Buttons */
+.media-links {
+    margin-top: auto; 
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.media-btn {
+    display: block;
+    padding: 12px;
+    text-decoration: none;
+    color: #ddd;
+    background: #1a1a1a;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    border: 1px solid #333;
+    transition: 0.2s;
+}
+
+.media-btn:hover { 
+    background: #8b0000; 
+    color: white; 
+    border-color: #8b0000;
+}
+
+.media-btn.podcast { border-left: 3px solid #d4af37; }
+.media-btn.video   { border-left: 3px solid #ff4d4d; }
+.media-btn.presentation   { border-left: 3px solid #d4af37; }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="menu-toggle" id="menu-toggle">☰</div>
+    
+    <div id="sidebar-container"></div>
+
+    <div class="main">
+        <nav class="breadcrumb">
+            <a href="/BEHS-Engineering-Hub/index.html">Home</a> / <span>Article Resources</span>
+        </nav>
+
+        <h1>PLTW Article Resources</h1>
+        <p class="subtitle">Multimedia supplements for the PLTW Curriculum.</p>
+
+        <div class="search-container">
+            <input type="text" id="resourceSearch" onkeyup="filterResources()" placeholder="Search...">
+        </div>
+
+        <div class="grid" id="resource-grid">
+            <div style="color: #666; padding: 20px;">Initializing Resource Database...</div>
+        </div>
+    </div>
+
+    <script src="/BEHS-Engineering-Hub/js/script.js"></script>
+</body>
+</html>

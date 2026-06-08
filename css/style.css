@@ -1,0 +1,415 @@
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  /* Blueprint/Grid Background Effect */
+  background: 
+    linear-gradient(rgba(139, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139, 0, 0, 0.05) 1px, transparent 1px),
+    radial-gradient(circle at top, #1a1a1a, #0a0a0a);
+  background-size: 40px 40px, 40px 40px, 100% 100%;
+  color: #f5f5f5;
+  display: flex;
+  min-height: 100vh;
+}
+
+h1, h2, h3 {
+  font-family: "Space Grotesk", sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* Custom Scrollbar */
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: #8b0000;
+  border-radius: 10px;
+}
+
+/* =========================
+   SIDEBAR & TOGGLE
+========================= */
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: #8b0000;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+}
+
+.sidebar {
+  width: 260px;
+  height: 100vh;
+  background: #0d0d0d;
+  border-right: 2px solid #8b0000;
+  padding-top: 20px;
+  position: fixed;
+  overflow-y: auto;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+}
+
+.sidebar.closed { transform: translateX(-100%); }
+
+.sidebar h2 {
+  text-align: center;
+  color: #d4af37;
+  font-size: 1.2rem;
+  padding: 0 10px;
+}
+
+.search {
+  margin: 15px;
+  padding: 10px;
+  width: calc(100% - 30px);
+  border-radius: 6px;
+  border: 1px solid #333;
+  background: #1a1a1a;
+  color: white;
+  outline: none;
+}
+
+.menu-title {
+  padding: 12px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #aaa;
+  transition: 0.2s;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.menu-title:hover {
+  background: #8b0000;
+  color: white;
+}
+
+.submenu { display: none; background: #050505; }
+.submenu.open { display: block; }
+
+.submenu a {
+  display: block;
+  padding: 10px 30px;
+  color: #999;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+.submenu a:hover, .active {
+  background: rgba(139, 0, 0, 0.2);
+  color: #d4af37 !important;
+  border-left: 4px solid #d4af37;
+}
+
+/* =========================
+   MAIN CONTENT
+========================= */
+.main {
+  margin-left: 260px;
+  padding: 40px;
+  width: 100%;
+  transition: margin-left 0.3s ease;
+}
+
+.main.expanded { margin-left: 0; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  margin-top: 30px;
+}
+
+.card {
+  background: rgba(20, 20, 20, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid #2a2a2a;
+  border-top: 4px solid #8b0000;
+  border-radius: 12px;
+  padding: 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(139, 0, 0, 0.3);
+  border-top-color: #d4af37;
+}
+
+.card h3 { color: #d4af37; margin-top: 0; }
+
+.card a {
+  display: block;
+  margin: 10px 0;
+  padding: 12px;
+  text-decoration: none;
+  color: #ddd;
+  background: #1a1a1a;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+.card a:hover { background: #8b0000; color: white; }
+
+@media (max-width: 768px) {
+  .menu-toggle { display: block; }
+  .main { margin-left: 0; padding: 60px 20px 20px; }
+}
+
+/* =========================
+   LESSON & ACTIVITY DRILL-DOWN
+========================= */
+.lesson-container {
+  margin-bottom: 8px;
+}
+
+/* The Lesson Button - Fixing the "White Box" issue */
+.lesson-btn {
+  width: 100%;
+  padding: 12px 15px;
+  background: #1a1a1a; /* Explicit Dark Background */
+  color: #d4af37;      /* Gold Text */
+  border: 1px solid #333;
+  border-radius: 6px;
+  text-align: left;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.lesson-btn:hover {
+  background: #252525;
+  border-color: #8b0000;
+  box-shadow: 0 0 10px rgba(139, 0, 0, 0.2);
+}
+
+/* Arrow indicator */
+.lesson-btn::after {
+  content: '▼';
+  font-size: 0.7rem;
+  transition: transform 0.3s;
+}
+
+.lesson-btn.active::after {
+  transform: rotate(180deg);
+}
+
+/* Activity List (Hidden by default) */
+.activity-list {
+  display: none;
+  background: #050505;
+  margin-top: -2px;
+  border: 1px solid #333;
+  border-top: none;
+  border-left: 3px solid #8b0000; /* Maroon accent */
+  border-radius: 0 0 6px 6px;
+  padding: 5px 0;
+}
+
+.activity-list.show {
+  display: block;
+}
+
+/* Activity Links */
+.activity-list a {
+  display: block;
+  padding: 10px 20px;
+  color: #bbb !important;
+  text-decoration: none;
+  font-size: 0.9rem;
+  background: transparent !important; /* Overrides previous card styles */
+}
+
+.activity-list a:hover {
+  color: white !important;
+  background: rgba(139, 0, 0, 0.1) !important;
+  padding-left: 25px; /* Slight indent on hover */
+}
+
+/* Adds a small 'external link' arrow after links that open in a new tab */
+.activity-list a[target="_blank"]::after {
+  content: ' ↗';
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+/*breadcrumbs code*/
+.breadcrumb {
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  color: #888;
+}
+.breadcrumb a {
+  color: #8b0000;
+  text-decoration: none;
+}
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   MEDIA RESOURCE CARDS
+========================= */
+.media-card {
+    background: #111;
+    border: 1px solid #333;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s;
+}
+
+.media-card:hover {
+    border-color: #8b0000;
+}
+
+.media-type {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8b0000;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.media-card h3 {
+    margin: 0 0 10px 0;
+    color: #d4af37;
+}
+
+.media-card p {
+    font-size: 0.9rem;
+    color: #aaa;
+    line-height: 1.4;
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+
+/* Button Group */
+.media-links {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.media-btn {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Individual Button Styles */
+.article { background: #222; color: white; }
+.article:hover { background: #333; }
+
+.podcast { background: #8b0000; color: white; }
+.podcast:hover { background: #a50000; }
+
+.video { background: #c4302b; color: white; } /* YouTube Red */
+.video:hover { background: #ff0000; }
+
+/* Hidden Audio Player Container */
+.player-container {
+    display: none;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #333;
+}
+
+.player-container.show {
+    display: block;
+}
+
+audio {
+    width: 100%;
+    height: 35px;
+    filter: invert(100%) hue-rotate(180deg) brightness(1.5); /* Makes player look better in dark mode */
+}
+
+/* Category Titles */
+
+.category-title {
+    color: #d4af37; /* Gold */
+    font-family: 'Space Grotesk', sans-serif;
+    margin: 50px 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #333;
+    font-size: 1.5rem;
+}
+
+/* Search Bar Styling */
+.search-container {
+    margin: 20px 0 40px 0;
+    position: sticky;
+    top: 10px;
+    z-index: 100;
+}
+
+#resourceSearch {
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 30px;
+    border: 2px solid #8b0000;
+    background: #111;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+/* Image Slot */
+.card-image {
+    width: 100%;
+    height: 120px;
+    background: #1a1a1a; /* Placeholder color */
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Add this to a new CSS file for your games */
+.game-container {
+    border: 2px solid #8b0000; /* BEHS Red */
+    background: #1a1a1a;
+    font-family: 'Space Grotesk', sans-serif;
+    color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.binary-cell {
+    width: 40px;
+    height: 40px;
+    background: #222;
+    border: 1px solid #444;
+    color: #00ff00; /* Classic "Matrix" Green for Binary */
+}
